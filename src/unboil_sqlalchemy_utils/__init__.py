@@ -57,3 +57,8 @@ async def fetch_one(session: AsyncSession, statement: Select[tuple[T]]) -> T | N
 async def fetch_all(session: AsyncSession, statement: Select[tuple[T]]) -> list[T]:
     result = await session.execute(statement)
     return list(result.scalars().all())
+
+async def save(session: AsyncSession, instance: T) -> T:
+    session.add(instance)
+    await session.commit()
+    return instance
