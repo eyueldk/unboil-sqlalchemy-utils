@@ -1,9 +1,19 @@
 import math
 from dataclasses import dataclass
-from typing import Generic, TypeVar
-from sqlalchemy import Select, func, select
+from typing import Any, Generic, TypeVar
+from sqlalchemy import Select, func, select, delete as sqla_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
+
+__all__ = [
+    "PaginatedResult",
+    "paginate",
+    "fetch_one",
+    "fetch_all",
+    "count",
+    "save_one",
+    "delete_one",
+]
 
 T = TypeVar("T")
 
@@ -58,7 +68,11 @@ async def fetch_all(session: AsyncSession, statement: Select[tuple[T]]) -> list[
     result = await session.execute(statement)
     return list(result.scalars().all())
 
-async def save(session: AsyncSession, instance: T) -> T:
+async def save_one(session: AsyncSession, instance: T) -> T:
     session.add(instance)
     await session.commit()
     return instance
+
+async def delete_one(session: AsyncSession, instance: Any) -> None:
+    await session.delete(instance)
+    await session.commit()
